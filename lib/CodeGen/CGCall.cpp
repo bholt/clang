@@ -2426,12 +2426,24 @@ RValue CodeGenFunction::EmitCall(const CGFunctionInfo &CallInfo,
           V = RV.getScalarVal();
         else
           V = Builder.CreateLoad(RV.getAggregateAddr());
-        
+
         // If the argument doesn't match, perform a bitcast to coerce it.  This
         // can happen due to trivial type mismatches.
-        if (IRArgNo < IRFuncTy->getNumParams() &&
-            V->getType() != IRFuncTy->getParamType(IRArgNo))
-          V = Builder.CreateBitCast(V, IRFuncTy->getParamType(IRArgNo));
+        if (IRArgNo < IRFuncTy->getNumParams()) {
+          
+          llvm::Type *VTy = V->getType();
+          llvm::Type *DestTy = IRFuncTy->getParamType(IRArgNo);
+          
+          // if addrspace doesn't match, perform addrspace cast
+          if (VTy->isPointerTy() && DestTy->isPointerTy() &&
+              VTy->getPointerAddressSpace() != DestTy->getPointerAddressSpace()) {
+            V = Builder.CreateAddrSpaceCast(V, DestTy);
+          } else if (VTy != DestTy) {
+            // otherwise we should be able to just do a bitcast
+            V = Builder.CreateBitCast(V, DestTy);
+          }
+        }
+        
         Args.push_back(V);
         
         checkArgMatches(V, IRArgNo, IRFuncTy);
