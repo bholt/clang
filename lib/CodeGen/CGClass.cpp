@@ -209,8 +209,12 @@ CodeGenFunction::GetAddressOfBaseClass(llvm::Value *Value,
                                           NonVirtualOffset,
                                           VirtualOffset);
   
-  // Cast to the destination type.
-  Value = Builder.CreateBitCast(Value, BasePtrTy);
+  // Cast to the destination type (using AddrSpaceCast if necessary)
+  if (Value->getType()->getPointerAddressSpace() != BasePtrTy->getPointerAddressSpace()) {
+    Value = Builder.CreateAddrSpaceCast(Value, BasePtrTy);
+  } else {
+    Value = Builder.CreateBitCast(Value, BasePtrTy);
+  }
 
   // Build a phi if we needed a null check.
   if (NullCheckValue) {
