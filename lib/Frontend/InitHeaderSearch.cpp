@@ -363,10 +363,14 @@ AddDefaultCPlusPlusIncludePaths(const llvm::Triple &triple, const HeaderSearchOp
 
     case llvm::Triple::x86:
     case llvm::Triple::x86_64:
-      AddGnuCPlusPlusIncludePaths("/usr/include/c++/4.2.1",
-                                  "i686-apple-darwin10", "", "x86_64", triple);
-      AddGnuCPlusPlusIncludePaths("/usr/include/c++/4.0.0",
-                                  "i686-apple-darwin8", "", "", triple);
+      AddGnuCPlusPlusIncludePaths( "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/c++/v1", "", "", "", triple);
+      AddGnuCPlusPlusIncludePaths( "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include", "", "", "", triple);
+      AddGnuCPlusPlusIncludePaths("/usr/local/include", "", "", "", triple);
+      
+      // AddGnuCPlusPlusIncludePaths("/usr/include/c++/4.2.1",
+      //                             "i686-apple-darwin10", "", "x86_64", triple);
+      // AddGnuCPlusPlusIncludePaths("/usr/include/c++/4.0.0",
+      //                             "i686-apple-darwin8", "", "", triple);
       break;
 
     case llvm::Triple::arm:
