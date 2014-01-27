@@ -4248,6 +4248,11 @@ TEST_F(FormatTest, UnderstandsOverloadedOperators) {
   verifyGoogleFormat("operator ::A();");
 
   verifyFormat("using A::operator+;");
+
+  verifyFormat("Deleted &operator=(const Deleted &)& = default;");
+  verifyFormat("Deleted &operator=(const Deleted &)&& = delete;");
+  verifyGoogleFormat("Deleted& operator=(const Deleted&)& = default;");
+  verifyGoogleFormat("Deleted& operator=(const Deleted&)&& = delete;");
 }
 
 TEST_F(FormatTest, UnderstandsNewAndDelete) {
@@ -6479,12 +6484,16 @@ TEST_F(FormatTest, DoNotCreateUnreasonableUnwrappedLines) {
   verifyFormat("void f() {\n"
                "  return g() {}\n"
                "  void h() {}");
-  verifyFormat("if (foo)\n"
-               "  return { forgot_closing_brace();\n"
-               "test();");
   verifyFormat("int a[] = { void forgot_closing_brace() { f();\n"
                "g();\n"
                "}");
+}
+
+TEST_F(FormatTest, DoNotPrematurelyEndUnwrappedLineForReturnStatements) {
+  verifyFormat(
+      "void f() {\n"
+      "  return C{ param1, param2 }.SomeCall(param1, param2);\n"
+      "}\n");
 }
 
 TEST_F(FormatTest, FormatsClosingBracesInEmptyNestedBlocks) {
